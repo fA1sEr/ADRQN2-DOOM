@@ -7,7 +7,7 @@ import numpy as np
 scenario_path = "/home/ghmiao/VizDoomDependFiles/ViZDoom/scenarios/simpler_basic.cfg" # Name and path of scenario
 
 class GameSimulator:
-    def __init__(self, frame_repeat=4, resolution=(80, 45, 4)):
+    def __init__(self, frame_repeat=4, resolution=(80, 45, 3)):
         self.game = None
         self.frame_repeat = frame_repeat
         self.resolution = resolution
