@@ -55,11 +55,11 @@ class Agent:
                 a = self.random_action()
             else:
                 a, self.state_in = self.model.get_best_action(state, self.state_in)
-                print('---------------------------------see best_a from net')
-                print(a)
+#                print('---------------------------------see best_a from net')
+#                print(a)
                 a = a[0]
-                print('---------------------------------see best_a will return')
-                print(a)
+#                print('---------------------------------see best_a will return')
+#                print(a)
         else:
             a, self.state_in = self.model.get_best_action(state, self.state_in)
             a = a[0]
