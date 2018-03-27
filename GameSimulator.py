@@ -7,7 +7,7 @@ import numpy as np
 scenario_path = "/home/ghmiao/VizDoomDependFiles/ViZDoom/scenarios/simpler_basic.cfg" # Name and path of scenario
 
 class GameSimulator:
-    def __init__(self, frame_repeat=4, resolution=(80, 45, 3)):
+    def __init__(self, frame_repeat=4, resolution=(80, 45, 4)):
         self.game = None
         self.frame_repeat = frame_repeat
         self.resolution = resolution
@@ -45,7 +45,26 @@ class GameSimulator:
         #img = img.reshape([self.screen_height, self.screen_width])
         # 如果进行预处理
         if preprocess: img = self.__preprocess(img)
-        return img
+
+        # put action into 4th channel
+        height = self.resolution[0]
+        width = self.resolution[1]
+        channel = self.resolution[2]
+        img = img.reshape([height*width*channel])
+        img = list(img)
+        action_space = height*width
+        action_len = action_space//len(self.actions)
+        action_remain = action_space%len(self.actions)
+        img = img + ([0]*action_remain)
+        for i in range(len(self.actions)):
+            if(i==self.last_action):
+                img = img + ([1]*action_len)
+            else:
+                img = img + ([0]*action_len)
+        img_with_action = np.array(img)
+        img_with_action = img_with_action.reshape([height,width,channel+1])
+
+        return img_with_action
     
     def get_action_size(self):
         # 获取动作数目
@@ -58,12 +77,8 @@ class GameSimulator:
         new_state = self.get_state()
         done = self.is_episode_finished()
         self.rewards += reward
-        last_action = self.last_action
         self.last_action = action
-        return last_action, new_state, reward, done
-
-    def get_last_action(self):
-        return self.last_action
+        return new_state, reward, done
     
     def is_episode_finished(self):
         # 判断游戏是否终止

@@ -8,8 +8,7 @@ class ReplayMemory:
         state_shape = (memory_cap, resolution[0], resolution[1], resolution[2])
         self.s1 = np.zeros(state_shape, dtype=np.float32)
         self.s2 = np.zeros(state_shape, dtype=np.float32)
-        self.a1 = np.zeros(memory_cap, dtype=np.int32)
-        self.a2 = np.zeros(memory_cap, dtype=np.int32)
+        self.a = np.zeros(memory_cap, dtype=np.int32)
         self.r = np.zeros(memory_cap, dtype=np.float32)
         self.d = np.zeros(memory_cap, dtype=np.float32)
 
@@ -19,11 +18,10 @@ class ReplayMemory:
         self.index = 0
         self.size = 0
 
-    def add_transition(self, a1, s1, a2, r, s2, d):
+    def add_transition(self, s1, a, r, s2, d):
 
-        self.a1[self.index] = a1
         self.s1[self.index, :, :, :] = s1
-        self.a2[self.index] = a2
+        self.a[self.index] = a
         self.r[self.index] = r
         self.s2[self.index, :, :, :] = s2
         self.d[self.index] = d
@@ -47,4 +45,4 @@ class ReplayMemory:
                     for i in range(self.trace_length):
                         indexes.append(point+i)
 
-        return self.a1[indexes], self.s1[indexes], self.a2[indexes], self.r[indexes], self.s2[indexes], self.d[indexes]
+        return self.s1[indexes], self.a[indexes], self.r[indexes], self.s2[indexes], self.d[indexes]

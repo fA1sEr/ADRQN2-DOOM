@@ -28,37 +28,40 @@ class Agent:
         self.hidden_size = hidden_size
         self.trace_length = trace_length
         self.epsilon = epsilon_max
-        self.action_fc_size = 128
 
         self.epsilon_decrease = (epsilon_max-epsilon_min)/epsilon_decay_steps
 
         self.min_buffer_size = batch_size*trace_length
 
-        self.state_in = (np.zeros([1, self.hidden_size+self.action_fc_size]), np.zeros([1, self.hidden_size+self.action_fc_size]))
+        self.state_in = (np.zeros([1, self.hidden_size]), np.zeros([1, self.hidden_size]))
 
-    def add_transition(self, a1, s1, a2, r, s2, d):
-        self.memory.add_transition(a1, s1, a2, r, s2, d)
+    def add_transition(self, s1, a, r, s2, d):
+        self.memory.add_transition(s1, a, r, s2, d)
 
     def learn_from_memory(self):
         if self.memory.size > self.min_buffer_size:
-            state_in = (np.zeros([self.batch_size, self.hidden_size+self.action_fc_size]), np.zeros([self.batch_size, self.hidden_size+self.action_fc_size]))
-            a1, s1, a2, r, s2, d = self.memory.get_transition()
+            state_in = (np.zeros([self.batch_size, self.hidden_size]), np.zeros([self.batch_size, self.hidden_size]))
+            s1, a, r, s2, d = self.memory.get_transition()
 
-            q = np.max(self.target_model.get_q(a2, s2, state_in), axis=1)
+            q = np.max(self.target_model.get_q(s2, state_in), axis=1)
             targets = r + self.gamma * (1 - d) * q
 
-            self.model.learn(a1, s1, targets, state_in, a2)
+            self.model.learn(s1, targets, state_in, a)
 
-    def act(self, last_action, state, train=True):
+    def act(self, state, train=True):
         if train:
             self.epsilon = self.explore(self.epsilon)
             if random() < self.epsilon:
                 a = self.random_action()
             else:
-                a, self.state_in = self.model.get_best_action(last_action, state, self.state_in)
+                a, self.state_in = self.model.get_best_action(state, self.state_in)
+                print('---------------------------------see best_a from net')
+                print(a)
                 a = a[0]
+                print('---------------------------------see best_a will return')
+                print(a)
         else:
-            a, self.state_in = self.model.get_best_action(last_action, state, self.state_in)
+            a, self.state_in = self.model.get_best_action(state, self.state_in)
             a = a[0]
         return a
 
@@ -69,4 +72,4 @@ class Agent:
         return randint(0, self.action_count - 1)
 
     def reset_cell_state(self):
-        self.state_in = (np.zeros([1, self.hidden_size+self.action_fc_size]), np.zeros([1, self.hidden_size+self.action_fc_size]))
+        self.state_in = (np.zeros([1, self.hidden_size]), np.zeros([1, self.hidden_size]))
