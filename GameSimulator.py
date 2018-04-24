@@ -7,7 +7,7 @@ import numpy as np
 scenario_path = "/home/ghmiao/VizDoomDependFiles/ViZDoom/scenarios/simpler_basic.cfg" # Name and path of scenario
 
 class GameSimulator:
-    def __init__(self, frame_repeat=4, resolution=(80, 45, 3)):
+    def __init__(self, frame_repeat=4, resolution=(45, 80, 3)):
         self.game = None
         self.frame_repeat = frame_repeat
         self.resolution = resolution
@@ -25,7 +25,12 @@ class GameSimulator:
         self.game.set_screen_resolution(ScreenResolution.RES_400X225)
         self.game.init()
         n = self.game.get_available_buttons_size()
-        self.actions = [list(a) for a in it.product([0, 1], repeat=n)]
+#        self.actions = [list(a) for a in it.product([0, 1], repeat=n)]
+        self.actions = []
+        for i in range(n):
+            ac = [0]*n
+            ac[i] = 1
+            self.actions.append(ac)
         print("self.actions---------------------------------")
         print(self.actions)
         print(type(self.actions))
@@ -74,6 +79,7 @@ class GameSimulator:
         now_action = self.actions[action]
         #print('make action ', now_action)
         reward = self.game.make_action(now_action, self.frame_repeat)
+        reward = reward / 10
         new_state = self.get_state()
         done = self.is_episode_finished()
         self.rewards += reward

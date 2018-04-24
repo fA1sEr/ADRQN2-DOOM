@@ -17,7 +17,7 @@ FRAME_REPEAT = 4 # How many frames 1 action should be repeated
 UPDATE_FREQUENCY = 4 # How many actions should be taken between each network update
 COPY_FREQUENCY = 1000
 
-RESOLUTION = (80, 45, 4) # Resolution
+RESOLUTION = (45, 80, 4) # Resolution
 BATCH_SIZE = 32 # Batch size for experience replay
 LEARNING_RATE = 0.001 # Learning rate of model
 GAMMA = 0.99 # Discount factor
@@ -159,7 +159,7 @@ if not SKIP_LEARNING:
                     print("Epoch %d Train Game %d get %.1f" % (epoch, games_cnt, game.get_total_reward()))
                     break
 
-            if SAVE_MODEL and games_cnt % 200 == 0:
+            if SAVE_MODEL and games_cnt % 100 == 0:
                 saver.save(SESSION, model_savefile)
                 print("Saving the network weigths to:", model_savefile)
 
